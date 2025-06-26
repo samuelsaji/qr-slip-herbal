@@ -163,10 +163,12 @@ export default function QRRequestApp() {
           <div className="mb-2">Purpose: {purpose}</div>
 
           <QRCodeCanvas value={qrData} size={256} className="mx-auto my-4" />
+          
 
           <div className="flex justify-between mt-6">
-            <div className="border-t pt-2 w-1/3 text-center">Authorized By</div>
-            <div className="border-t pt-2 w-1/3 text-center">Received By</div>
+            <div className="border-t pt-2 w-1/3 text-center">Authorized Sign:</div>
+            <br></br>
+            <div className="border-t pt-2 w-1/3 text-center">Received By:</div>
           </div>
 
           <button className="mt-6" onClick={() => window.print()}>Print Slip</button>
