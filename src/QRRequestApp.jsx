@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import productList from './products.json'; // ✅ Import products correctly
+import Select from 'react-select';
 
 const units = ['pcs', 'box', 'set', 'pack'];
 const departments = ['IT', 'HR', 'Accounts', 'Operations', 'Maintenance'];
@@ -135,13 +136,13 @@ export default function QRRequestApp() {
             <h2 className="text-lg font-bold mb-4 text-green-700">Requested Items</h2>
             {requests.map((r, i) => (
               <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <input
-                  list="products"
-                  className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
-                  value={r.item}
-                  onChange={e => handleNewItem(i, e.target.value)}
-                  placeholder="Enter or select item"
-                />
+              <Select
+                options={products.map(p => ({ value: p, label: p }))}
+                onChange={selected => handleNewItem(i, selected?.value || '')}
+                placeholder="Search or select item"
+                isClearable
+              />
+
                 <datalist id="products">
                   {products.map(p => (
                     <option key={p} value={p} />
@@ -196,7 +197,7 @@ export default function QRRequestApp() {
             <div className="mb-6">
               <QRCodeCanvas value={qrData} size={200} className="mx-auto my-4" />
             </div>
-            <div className="mb-6" style={{textAlign:'-webkit-center'}}>
+            <div className="mb-6">
               <h3 className="font-semibold text-lg mb-2 text-gray-800">Items Requested</h3>
               <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                 <thead className="bg-blue-50">
@@ -206,7 +207,7 @@ export default function QRRequestApp() {
                     <th className="py-2 px-4 border-b text-left">Unit</th>
                   </tr>
                 </thead>
-                <tbody class="text-center">
+                <tbody>
                   {requests.filter(r => r.item && r.qty && r.unit).map((r, i) => (
                     <tr key={i}>
                       <td className="py-2 px-4 border-b">{r.item}</td>
@@ -217,15 +218,14 @@ export default function QRRequestApp() {
                 </tbody>
               </table>
             </div>
-            <br></br>
             <div className="flex justify-between mt-8 print:mt-4">
               <div className="border-t-2 border-gray-400 pt-2 w-1/3 text-center text-gray-600">Authorized Sign</div>
-              <br></br>
               <div className="border-t-2 border-gray-400 pt-2 w-1/3 text-center text-gray-600">Received By</div>
             </div>
             <button
               className="mt-8 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition print:hidden"
-              onClick={() => window.print()}>
+              onClick={() => window.print()}
+            >
               Print Slip
             </button>
           </div>
