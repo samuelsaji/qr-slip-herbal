@@ -33,14 +33,24 @@ export default function QRRequestApp() {
   const [requests, setRequests] = useState([]);
   const [qrData, setQrData] = useState('');
   const [products, setProducts] = useState([]);
+  const accountCodes = ['AC-101', 'AC-102', 'AC-103', 'AC-200'];
+  const dimensions = ['12-inch', '18-inch', '24-inch', '36-inch'];
+
 
   useEffect(() => {
     setProducts(productList);
   }, []);
 
-  const handleAddRequest = () => {
-    setRequests([...requests, { item: '', qty: 1, unit: 'pcs' }]);
-  };
+      const handleAddRequest = () => {
+      setRequests([...requests, {
+        item: '',
+        qty: 1,
+        unit: 'pcs',
+        accountCode: '',
+        dimension: ''
+      }]);
+    };
+
 
   const handleChange = (index, key, value) => {
     const updated = [...requests];
@@ -93,24 +103,25 @@ export default function QRRequestApp() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 mb-10 border-t-8 border-green-400">
-          <h1 className="text-4xl font-extrabold text-center text-green-700 mb-8 tracking-tight">Material Request Slip</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-2xl p-10 mb-10 border-t-8 border-green-400">
+          <h1 className="text-4xl font-extrabold text-center text-green-700 mb-10 tracking-tight">Material Request Slip</h1>
+
+          {/* Staff Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
             <div>
-              <label className="block mb-2 text-gray-600 font-semibold">Staff Name</label>
-              <input
-                className="w-full p-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400"
+              <label className="block mb-4 text-gray-600 font-semibold text-lg" >Staff Name</label>
+              <input className="w-full p-5 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400 text-lg"
                 value={staffName}
                 onChange={e => setStaffName(e.target.value)}
                 placeholder="Enter your name"
               />
             </div>
             <div>
-              <label className="block mb-2 text-gray-600 font-semibold">Department</label>
+              <label className="block mb-4 text-gray-600 font-semibold text-lg">Department</label>
               <select
-                className="w-full p-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400"
+                className="w-full p-5 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400 text-lg"
                 value={department}
                 onChange={e => setDepartment(e.target.value)}>
                 <option value="">-- Select Department --</option>
@@ -121,33 +132,36 @@ export default function QRRequestApp() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <label className="block mb-2 text-gray-600 font-semibold">Purpose of Requirement</label>
+          {/* Purpose */}
+          <div className="mb-12">
+            <label className="block mb-4 text-gray-600 font-semibold text-lg">Purpose of Requirement</label>
             <textarea
-              className="w-full border-2 border-green-200 rounded-lg p-3 focus:outline-none focus:border-green-400"
-              rows="2"
+              className="w-full border-2 border-green-200 rounded-lg p-5 focus:outline-none focus:border-green-400 text-lg"
+              rows="4"
               value={purpose}
               onChange={e => setPurpose(e.target.value)}
               placeholder="Describe the purpose"
             />
           </div>
 
-          <div className="mt-8">
-            <h2 className="text-lg font-bold mb-4 text-green-700">Requested Items</h2>
-            {requests.map((r, i) => (
-              <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Select
-                options={products.map(p => ({ value: p, label: p }))}
-                onChange={selected => handleNewItem(i, selected?.value || '')}
-                placeholder="Search or select item"
-                isClearable
-              />
+          {/* Item Entry */}
+          <div>
+            <h2 className="text-xl font-bold mb-4 text-green-700">Requested Items</h2>
+            <div className="space-y-4">
+              {requests.map((r, i) => (
+                <div key={i} className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
+                {/* Item dropdown */}
+                <div className="md:col-span-2">
+                  <Select
+                    options={products.map(p => ({ value: p, label: p }))}
+                    onChange={selected => handleNewItem(i, selected?.value || '')}
+                    placeholder="Select item"
+                    isClearable
+                    className="text-sm"
+                  />
+                </div>
 
-                <datalist id="products">
-                  {products.map(p => (
-                    <option key={p} value={p} />
-                  ))}
-                </datalist>
+                {/* Qty */}
                 <input
                   type="number"
                   className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
@@ -156,6 +170,8 @@ export default function QRRequestApp() {
                   onChange={e => handleChange(i, 'qty', e.target.value)}
                   placeholder="Qty"
                 />
+
+                {/* Unit */}
                 <select
                   className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
                   value={r.unit}
@@ -164,10 +180,34 @@ export default function QRRequestApp() {
                     <option key={u} value={u}>{u}</option>
                   ))}
                 </select>
+
+                {/* Account Code */}
+                <select
+                  className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
+                  value={r.accountCode}
+                  onChange={e => handleChange(i, 'accountCode', e.target.value)}>
+                  <option value="">Account Code</option>
+                  {accountCodes.map(code => (
+                    <option key={code} value={code}>{code}</option>
+                  ))}
+                </select>
+
+                {/* Dimension */}
+                <select
+                  className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
+                  value={r.dimension}
+                  onChange={e => handleChange(i, 'dimension', e.target.value)}>
+                  <option value="">Dimension</option>
+                  {dimensions.map(dim => (
+                    <option key={dim} value={dim}>{dim}</option>
+                  ))}
+                </select>
               </div>
-            ))}
+              ))}
+            </div>
+
             <button
-              className="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              className="mt-6 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               onClick={handleAddRequest}
             >
               + Add Item
@@ -175,13 +215,14 @@ export default function QRRequestApp() {
           </div>
 
           <button
-            className="mt-8 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow"
+            className="mt-10 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow"
             onClick={generateQR}
           >
             Generate QR Code
           </button>
         </div>
 
+        {/* QR Preview */}
         {qrData && (
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-t-8 border-blue-400 print:border-t-0 print:shadow-none print:p-2">
             <h2 className="text-2xl font-bold mb-6 text-blue-700">Request Slip</h2>
@@ -199,7 +240,7 @@ export default function QRRequestApp() {
             </div>
             <div className="mb-6">
               <h3 className="font-semibold text-lg mb-2 text-gray-800">Items Requested</h3>
-              <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+              <table className="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
                 <thead className="bg-blue-50">
                   <tr>
                     <th className="py-2 px-4 border-b text-left">Item</th>
@@ -232,5 +273,6 @@ export default function QRRequestApp() {
         )}
       </div>
     </div>
+
   );
 }
