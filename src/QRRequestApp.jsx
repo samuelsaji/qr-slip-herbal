@@ -1,12 +1,8 @@
 // Frontend: React-based web app for QR-based request slip generation
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-
-
-const initialProducts = [
-  'Keyboard', 'Mouse', 'Monitor', 'Laptop', 'Charger', 'Headset'
-];
+import productList from './products.json'; // ✅ Import products correctly
 
 const units = ['pcs', 'box', 'set', 'pack'];
 const departments = ['IT', 'HR', 'Accounts', 'Operations', 'Maintenance'];
@@ -35,8 +31,15 @@ export default function QRRequestApp() {
   const [purpose, setPurpose] = useState('');
   const [requests, setRequests] = useState([]);
   const [qrData, setQrData] = useState('');
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
 
+  useEffect(() => {
+    setProducts(productList);
+  }, []);
+
+  
+
+  
   const handleAddRequest = () => {
     setRequests([...requests, { item: '', qty: 1, unit: 'pcs' }]);
   };
@@ -55,104 +58,139 @@ export default function QRRequestApp() {
   };
 
   const generateQR = () => {
-    const items = requests
-      .filter(r => r.item && r.qty)
-      .map(r => `${r.item}:${r.qty}${r.unit}`)
-      .join('|');
-    const data = `${slipNo},${dateTime},${department},${staffName},${items},Purpose:${purpose}`;
-    setQrData(data);
-  };
+  if (!staffName.trim()) {
+    alert("Please enter Staff Name.");
+    return;
+  }
+
+  if (!department) {
+    alert("Please select a Department.");
+    return;
+  }
+
+  if (requests.length === 0) {
+    alert("Please add at least one item.");
+    return;
+  }
+
+  const validItems = requests.filter(r => r.item && r.qty && r.unit);
+
+  if (validItems.length === 0) {
+    alert("Please complete at least one item with name, quantity, and unit.");
+    return;
+  }
+
+  if (!purpose.trim()) {
+    alert("Please enter a purpose.");
+    return;
+  }
+
+  const items = validItems
+    .map(r => `${r.item}:${r.qty}${r.unit}`)
+    .join('|');
+
+  const data = `${slipNo},${dateTime},${department},${staffName},${items},Purpose:${purpose}`;
+  setQrData(data);
+};
+
 
   return (
-    <div className="p-6 max-w-4xl mx-auto font-sans">
-      <h1 className="text-3xl font-bold mb-6 text-center">Material Request Slip</h1>
+    
+      <div>
+      <div className="p-6 max-w-4xl mx-auto font-sans no-print">
+        <h1 className="text-3xl font-bold mb-6 text-center">Material Request Slip</h1>
 
-      <div className="mb-6 shadow-lg">
-        <div>
-          <div className="mb-4">
-            <div className="mb-1 text-sm text-gray-500">Slip No:</div>
-            <div className="font-semibold">{slipNo}</div>
-          </div>
-          <div className="mb-4">
-            <div className="mb-1 text-sm text-gray-500">Date & Time:</div>
-            <div className="font-semibold">{dateTime}</div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block mb-1 text-sm font-medium">Staff Name</label>
-              <input
-                className="w-full p-2 border rounded"
-                value={staffName}
-                onChange={e => setStaffName(e.target.value)}
-              />
+        <div className="mb-6 shadow-lg">
+          <div>
+            <div className="mb-4">
+              <div className="mb-1 text-sm text-gray-500">Slip No:</div>
+              <div className="font-semibold">{slipNo}</div>
             </div>
-            <div>
-              <label className="block mb-1 text-sm font-medium">Department</label>
-              <select
-                className="w-full p-2 border rounded"
-                value={department}
-                onChange={e => setDepartment(e.target.value)}>
-                <option value="">-- Select Department --</option>
-                {departments.map(dep => (
-                  <option key={dep} value={dep}>{dep}</option>
-                ))}
-              </select>
+            <div className="mb-4">
+              <div className="mb-1 text-sm text-gray-500">Date & Time:</div>
+              <div className="font-semibold">{dateTime}</div>
             </div>
-          </div>
 
-          <div className="mb-6">
-            <button variant="outline" onClick={handleAddRequest}>+ Add Item</button>
-          </div>
-
-          {requests.map((r, i) => (
-            <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
+                <label className="block mb-1 text-sm font-medium">Staff Name</label>
                 <input
-                  list="products"
-                  className="border p-2 rounded w-full"
-                  value={r.item}
-                  onChange={e => handleNewItem(i, e.target.value)}
-                  placeholder="Enter or select item"
+                  className="w-full p-2 border rounded"
+                  value={staffName}
+                  onChange={e => setStaffName(e.target.value)}
                 />
-                <datalist id="products">
-                  {products.map(p => (
-                    <option key={p} value={p} />
-                  ))}
-                </datalist>
               </div>
-              <input
-                type="number"
-                className="border p-2 rounded w-full"
-                value={r.qty}
-                min="1"
-                onChange={e => handleChange(i, 'qty', e.target.value)}
-              />
-              <select
-                className="border p-2 rounded w-full"
-                value={r.unit}
-                onChange={e => handleChange(i, 'unit', e.target.value)}>
-                {units.map(u => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
-              </select>
+              <div>
+                <label className="block mb-1 text-sm font-medium">Department</label>
+                <select
+                  className="w-full p-2 border rounded"
+                  value={department}
+                  onChange={e => setDepartment(e.target.value)}>
+                  <option value="">-- Select Department --</option>
+                  {departments.map(dep => (
+                    <option key={dep} value={dep}>{dep}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          ))}
 
-          <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Purpose of Requirement</label>
-            <textarea
-              className="w-full border p-2 rounded"
-              rows="3"
-              value={purpose}
-              onChange={e => setPurpose(e.target.value)}
-            />
+            <div className="mb-6">
+              <button variant="outline" onClick={handleAddRequest}>+ Add Item</button>
+            </div>
+
+            {requests.map((r, i) => (
+              <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <input
+                    list="products"
+                    className="border p-2 rounded w-full"
+                    value={r.item}
+                    onChange={e => handleNewItem(i, e.target.value)}
+                    placeholder="Enter or select item"
+                  />
+                  <datalist id="products">
+                    {products.map(p => (
+                      <option key={p} value={p} />
+                    ))}
+                  </datalist>
+                </div>
+                <input
+                  type="number"
+                  className="border p-2 rounded w-full"
+                  value={r.qty}
+                  min="1"
+                  onChange={e => handleChange(i, 'qty', e.target.value)}
+                />
+                <select
+                  className="border p-2 rounded w-full"
+                  value={r.unit}
+                  onChange={e => handleChange(i, 'unit', e.target.value)}>
+                  {units.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium">Purpose of Requirement</label>
+              <textarea
+                className="w-full border p-2 rounded"
+                rows="3"
+                value={purpose}
+                onChange={e => setPurpose(e.target.value)}
+              />
+            </div>
+
+            <button className="mt-2 w-full" onClick={generateQR}>Generate QR Code</button>
           </div>
-
-          <button className="mt-2 w-full" onClick={generateQR}>Generate QR Code</button>
         </div>
+        
       </div>
 
+
+
+      
       {qrData && (
         <div className="p-6 shadow-lg text-center">
           <h2 className="text-2xl font-semibold mb-4">Generated Request Slip</h2>
@@ -174,6 +212,6 @@ export default function QRRequestApp() {
           <button className="mt-6" onClick={() => window.print()}>Print Slip</button>
         </div>
       )}
-    </div>
+      </div>
   );
 }
