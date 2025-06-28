@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import productList from './products.json'; // ✅ Import products correctly
 import Select from 'react-select';
+import accountCodes from './accounts.json';
+import './index.css';
+
 
 const units = ['pcs', 'box', 'set', 'pack'];
 const departments = ['IT', 'HR', 'Accounts', 'Operations', 'Maintenance'];
@@ -33,14 +36,25 @@ export default function QRRequestApp() {
   const [requests, setRequests] = useState([]);
   const [qrData, setQrData] = useState('');
   const [products, setProducts] = useState([]);
+  const accountCodeOptions = accountCodes; // ✅ no map needed if it's already in value/label format
+
+  const dimensions = ['AOH', 'BLP', 'BLR', 'CLT', 'CSTR', 'DGP', 'DGP-CR', 'DGP-PW', 'ETP', 'FDGP', 'FOH', 'FTP', 'GPB', 'GRP', 'HGP', 'HVP', 'MUS', 'NPD', 'PWR', 'QAQC', 'RPB', 'SCC', 'SFD', 'SGCG', 'SGU-F', 'SGU-M', 'SGU-T', 'SPD', 'STR', 'USB', 'WHP', '(blank)'];
+
 
   useEffect(() => {
     setProducts(productList);
   }, []);
 
   const handleAddRequest = () => {
-    setRequests([...requests, { item: '', qty: 1, unit: 'pcs' }]);
-  };
+  setRequests([...requests, {
+    item: '',
+    qty: 1,
+    unit: 'pcs',
+    accountCode: '',
+    dimension: ''
+  }]);
+};
+
 
   const handleChange = (index, key, value) => {
     const updated = [...requests];
@@ -83,9 +97,10 @@ export default function QRRequestApp() {
     return;
   }
 
-  const items = validItems
-    .map(r => `${r.item}:${r.qty}${r.unit}`)
-    .join('|');
+ const items = validItems
+  .map(r => `${r.item}:${r.qty}${r.unit}:${r.accountCode}:${r.dimension}`)
+  .join('|');
+
 
   const data = `${slipNo},${dateTime},${department},${staffName},${items},Purpose:${purpose}`;
   setQrData(data);
@@ -135,36 +150,60 @@ export default function QRRequestApp() {
           <div className="mt-8">
             <h2 className="text-lg font-bold mb-4 text-green-700">Requested Items</h2>
             {requests.map((r, i) => (
-              <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div key={i} className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
+            {/* Item Name (searchable) */}
+            <div className="md:col-span-2">
               <Select
                 options={products.map(p => ({ value: p, label: p }))}
                 onChange={selected => handleNewItem(i, selected?.value || '')}
-                placeholder="Search or select item"
+                placeholder="Select item"
                 isClearable
+                className="text-sm"
               />
+            </div>
 
-                <datalist id="products">
-                  {products.map(p => (
-                    <option key={p} value={p} />
-                  ))}
-                </datalist>
-                <input
-                  type="number"
-                  className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
-                  value={r.qty}
-                  min="1"
-                  onChange={e => handleChange(i, 'qty', e.target.value)}
-                  placeholder="Qty"
-                />
-                <select
-                  className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
-                  value={r.unit}
-                  onChange={e => handleChange(i, 'unit', e.target.value)}>
-                  {units.map(u => (
-                    <option key={u} value={u}>{u}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Quantity */}
+            <input
+              type="number"
+              className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
+              value={r.qty}
+              min="1"
+              onChange={e => handleChange(i, 'qty', e.target.value)}
+              placeholder="Qty"
+            />
+
+            {/* Unit */}
+            <select
+              className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
+              value={r.unit}
+              onChange={e => handleChange(i, 'unit', e.target.value)}>
+              {units.map(u => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
+
+            {/* Account Code (searchable) */}
+          <Select
+              options={accountCodeOptions}
+              onChange={selected => handleChange(i, 'accountCode', selected?.value || '')}
+              placeholder="Account Code"
+              isClearable
+              className="text-sm"
+            />
+
+
+            {/* Dimension (simple dropdown) */}
+            <select
+              className="border-2 border-green-200 p-2 rounded-lg w-full focus:outline-none focus:border-green-400"
+              value={r.dimension}
+              onChange={e => handleChange(i, 'dimension', e.target.value)}>
+              <option value="">Dimension</option>
+              {dimensions.map(dim => (
+                <option key={dim} value={dim}>{dim}</option>
+              ))}
+            </select>
+          </div>
+
             ))}
             <button
               className="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
@@ -198,8 +237,9 @@ export default function QRRequestApp() {
               <QRCodeCanvas value={qrData} size={200} className="mx-auto my-4" />
             </div>
             <div className="mb-6">
-              <h3 className="font-semibold text-lg mb-2 text-gray-800">Items Requested</h3>
-              <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+            <h3 className="font-semibold text-lg mb-2 text-gray-800">Items Requested</h3>
+            <div className="flex justify-center">
+              <table className="border border-gray-200 rounded-lg overflow-hidden text-sm mx-auto">
                 <thead className="bg-blue-50">
                   <tr>
                     <th className="py-2 px-4 border-b text-left">Item</th>
@@ -218,6 +258,8 @@ export default function QRRequestApp() {
                 </tbody>
               </table>
             </div>
+          </div>
+
             <div className="flex justify-between mt-8 print:mt-4">
               <div className="border-t-2 border-gray-400 pt-2 w-1/3 text-center text-gray-600">Authorized Sign</div>
               <div className="border-t-2 border-gray-400 pt-2 w-1/3 text-center text-gray-600">Received By</div>
