@@ -108,24 +108,25 @@ export default function QRRequestApp() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 mb-10 border-t-8 border-green-400">
-          <h1 className="text-4xl font-extrabold text-center text-green-700 mb-8 tracking-tight">Material Request Slip</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-2xl p-10 mb-10 border-t-8 border-green-400">
+          <h1 className="text-4xl font-extrabold text-center text-green-700 mb-10 tracking-tight">Material Request Slip</h1>
+
+          {/* Staff Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
             <div>
-              <label className="block mb-2 text-gray-600 font-semibold">Staff Name</label>
-              <input
-                className="w-full p-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400"
+              <label className="block mb-4 text-gray-600 font-semibold text-lg" >Staff Name</label>
+              <input className="w-full p-5 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400 text-lg"
                 value={staffName}
                 onChange={e => setStaffName(e.target.value)}
                 placeholder="Enter your name"
               />
             </div>
             <div>
-              <label className="block mb-2 text-gray-600 font-semibold">Department</label>
+              <label className="block mb-4 text-gray-600 font-semibold text-lg">Department</label>
               <select
-                className="w-full p-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400"
+                className="w-full p-5 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400 text-lg"
                 value={department}
                 onChange={e => setDepartment(e.target.value)}>
                 <option value="">-- Select Department --</option>
@@ -136,11 +137,12 @@ export default function QRRequestApp() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <label className="block mb-2 text-gray-600 font-semibold">Purpose of Requirement</label>
+          {/* Purpose */}
+          <div className="mb-12">
+            <label className="block mb-4 text-gray-600 font-semibold text-lg">Purpose of Requirement</label>
             <textarea
-              className="w-full border-2 border-green-200 rounded-lg p-3 focus:outline-none focus:border-green-400"
-              rows="2"
+              className="w-full border-2 border-green-200 rounded-lg p-5 focus:outline-none focus:border-green-400 text-lg"
+              rows="4"
               value={purpose}
               onChange={e => setPurpose(e.target.value)}
               placeholder="Describe the purpose"
@@ -206,7 +208,7 @@ export default function QRRequestApp() {
 
             ))}
             <button
-              className="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              className="mt-6 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               onClick={handleAddRequest}
             >
               + Add Item
@@ -214,13 +216,14 @@ export default function QRRequestApp() {
           </div>
 
           <button
-            className="mt-8 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow"
+            className="mt-10 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow"
             onClick={generateQR}
           >
             Generate QR Code
           </button>
         </div>
 
+        {/* QR Preview */}
         {qrData && (
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-t-8 border-blue-400 print:border-t-0 print:shadow-none print:p-2">
             <h2 className="text-2xl font-bold mb-6 text-blue-700">Request Slip</h2>
@@ -274,5 +277,6 @@ export default function QRRequestApp() {
         )}
       </div>
     </div>
+
   );
 }
