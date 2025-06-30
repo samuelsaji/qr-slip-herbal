@@ -114,7 +114,7 @@ export default function QRRequestApp() {
   return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
       <div className="max-w-3xl mx-auto">
-        <div className="no-print bg-white rounded-2xl shadow-2xl p-10 mb-10 border-t-8 border-green-400">
+        <div className="no-print bg-white rounded-2xl shadow-2xl p-10 mb-10 border-t-8 border-black-400">
           <h1 className="text-4xl font-extrabold text-center mb-10 tracking-tight">Material Request Slip</h1>
           <div className='flex justify-between items-center mb-8'>
             {/* Staff Info */}
