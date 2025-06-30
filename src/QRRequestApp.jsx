@@ -121,7 +121,7 @@ export default function QRRequestApp() {
           <div className="ml-10 grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
             <div>
               <label className="block mr-10  mb-4 text-gray-600 font-semibold text-lg " >Staff Name</label>
-              <input className=" p-5 border-2 rounded-lg focus:outline-none focus:border-green-400 text-lg"
+              <input className=" p-5 border-2 rounded-lg focus:outline-none text-lg"
                 value={staffName}
                 onChange={e => setStaffName(e.target.value)}
                 placeholder="Enter your name"
@@ -134,7 +134,7 @@ export default function QRRequestApp() {
           <div className="mb-10">
             <label className="block mb-4 mr-25 text-gray-600 font-semibold text-lg">Purpose of Requirement</label>
             <textarea
-              className=" pr-15 border-2 rounded-lg p-5 pl-20 focus:outline-none focus:border-green-400 text-lg"
+              className=" pr-15 border-2 rounded-lg p-5 pl-20 focus:outline-none text-lg"
               rows="1"
               value={purpose}
               onChange={e => setPurpose(e.target.value)}
