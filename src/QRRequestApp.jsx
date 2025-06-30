@@ -63,6 +63,13 @@ export default function QRRequestApp() {
     setRequests(updated);
   };
 
+  const handleRemoveRequest = (index) => {
+  const updated = [...requests];
+  updated.splice(index, 1);
+  setRequests(updated);
+};
+
+
   const handleNewItem = (index, newItem) => {
     if (!products.includes(newItem)) {
       setProducts([...products, newItem]);
@@ -76,46 +83,45 @@ export default function QRRequestApp() {
     return;
   }
 
-  
+  if (!purpose.trim()) {
+    alert("Please enter a purpose.");
+    return;
+  }
 
   if (requests.length === 0) {
     alert("Please add at least one item.");
     return;
   }
 
-  const validItems = requests.filter(r => r.item && r.qty && r.unit);
-
-  if (validItems.length === 0) {
-    alert("Please complete at least one item with name, quantity, and unit.");
-    return;
+  for (let i = 0; i < requests.length; i++) {
+    const r = requests[i];
+    if (!r.item || !r.qty || !r.unit || !r.accountCode || !r.dimension) {
+      alert(`Please complete all fields for item ${i + 1}`);
+      return;
+    }
   }
 
-  if (!purpose.trim()) {
-    alert("Please enter a purpose.");
-    return;
-  }
+  const items = requests.map(r =>
+    `${r.item}:${r.qty}${r.unit}:${r.accountCode}:${r.dimension}`
+  ).join('|');
 
-  const items = validItems
-  .map(r => `${r.item}:${r.qty}${r.unit}:${r.accountCode}:${r.dimension}`)
-  .join('|');
-
-
-  const data = `${slipNo},${dateTime},${department},${staffName},${items},Purpose:${purpose}`;
+  const data = `${slipNo},${dateTime},${staffName},${items},Purpose:${purpose}`;
   setQrData(data);
 };
+
 
 
   return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10">
       <div className="max-w-3xl mx-auto">
         <div className="no-print bg-white rounded-2xl shadow-2xl p-10 mb-10 border-t-8 border-green-400">
-          <h1 className="text-4xl font-extrabold text-center text-green-700 mb-10 tracking-tight">Material Request Slip</h1>
+          <h1 className="text-4xl font-extrabold text-center mb-10 tracking-tight">Material Request Slip</h1>
           <div className='flex justify-between items-center mb-8'>
             {/* Staff Info */}
           <div className="ml-10 grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
             <div>
               <label className="block mr-10  mb-4 text-gray-600 font-semibold text-lg " >Staff Name</label>
-              <input className=" p-5 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-400 text-lg"
+              <input className=" p-5 border-2 rounded-lg focus:outline-none focus:border-green-400 text-lg"
                 value={staffName}
                 onChange={e => setStaffName(e.target.value)}
                 placeholder="Enter your name"
@@ -128,7 +134,7 @@ export default function QRRequestApp() {
           <div className="mb-10">
             <label className="block mb-4 mr-25 text-gray-600 font-semibold text-lg">Purpose of Requirement</label>
             <textarea
-              className=" pr-15 border-2 border-green-200 rounded-lg p-5 pl-20 focus:outline-none focus:border-green-400 text-lg"
+              className=" pr-15 border-2 rounded-lg p-5 pl-20 focus:outline-none focus:border-green-400 text-lg"
               rows="1"
               value={purpose}
               onChange={e => setPurpose(e.target.value)}
@@ -140,7 +146,7 @@ export default function QRRequestApp() {
           
 
 <div className="mt-8">
-  <h2 className="text-lg font-bold mb-4 text-green-700">Requested Items</h2>
+  <h2 className="text-lg font-bold mb-4">Requested Items</h2>
   {requests.map((r, i) => (
     <div key={i} className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -222,6 +228,16 @@ export default function QRRequestApp() {
             ))}
           </select>
         </div>
+        <div className="flex justify mt-2">
+        <button
+          className="text-red-600 text-sm hover:underline flex items-center"
+          onClick={() => handleRemoveRequest(i)}
+        >
+          <span className="mr-1">🗑</span> Remove
+        </button>
+      </div>
+
+
       </div>
     </div>
   ))}
@@ -251,7 +267,7 @@ export default function QRRequestApp() {
         {/* Header */}
         <div className="text-center py-6 px-4 border-b-2 border-dashed border-gray-300">
           <h1 className="text-xl font-bold uppercase tracking-wider mb-2">REQUEST SLIP</h1>
-          <div className="text-xs text-gray-600 uppercase">Purchase Receipt Style</div>
+          <div className="text-xs text-gray-600 uppercase">Herbal Isolates (P)Ltd</div>
         </div>
         
         {/* Receipt Details */}
